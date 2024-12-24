@@ -16,23 +16,23 @@ class Game:
         self.__current_picture = None  # the current picture displayed on the city label
         self.__player_mode = "one player"  # the mode of the game: single player or two players
         self.__score = [None, None]  # the score of the two players for two players mode
-        script_dir = os.path.dirname(os.path.abspath(__file__)) # the directory of the script
+        self.__script_dir = os.path.dirname(os.path.abspath(__file__)) # the directory of the script
 
         self.__city_images = []
         for image_file in CITY_FILES:  # Adding the images to self.__city_images
-            new_image = PhotoImage(file=os.path.join(script_dir, image_file))
+            new_image = PhotoImage(file=os.path.join(self.__script_dir, image_file))
             self.__city_images.append(new_image)
 
         self.__city_label = Label(self.__main_window, anchor=N)
         self.__city_label.grid(row=0, column=1, rowspan=3, padx=20, sticky=W + E + S + N)
 
-        self.__end_image = PhotoImage(file=f"{script_dir}/end.gif")  # image displayed once the game has ended
+        self.__end_image = PhotoImage(file=f"{self.__script_dir}/end.gif")  # image displayed once the game has ended
 
         # Below are buttons and labels that are displayed in the start menu
         # ================================================================================================== #
-        start = PhotoImage(file=f"{script_dir}/start.gif")  # start,
-        info = PhotoImage(file=f"{script_dir}/info.gif")  # info,
-        close = PhotoImage(file=f"{script_dir}/close.gif") # close
+        start = PhotoImage(file=f"{self.__script_dir}/start.gif")  # start,
+        info = PhotoImage(file=f"{self.__script_dir}/info.gif")  # info,
+        close = PhotoImage(file=f"{self.__script_dir}/close.gif") # close
         self.__start_button = Button(self.__main_window, image=start, command=self.start)
         self.__info_button = Button(self.__main_window, image=info, command=self.info)
         self.__info_label = Label(self.__main_window, text="")
@@ -101,7 +101,7 @@ class Game:
             current_pyimage = self.__city_images.pop(random.randint(0, len(self.__city_images) - 1))
             self.__city_label["image"] = current_pyimage
             self.__city_label.image = current_pyimage  # reference to avoid garbage collection
-            self.__current_picture = current_pyimage["file"]
+            self.__current_picture = current_pyimage["file"].split("/")[-1]  # the current picture's name (remove the script_dir)
         except ValueError:
             if self.__player_mode == "one player":
                 self.if_end_one_player()
@@ -116,6 +116,7 @@ class Game:
         """
         current_cities = self.assign_button()
         current_pic = self.__current_picture
+
         if CITY_FILES[current_pic] in current_cities:
             return True
         else:
@@ -158,7 +159,6 @@ class Game:
             self.if_end_one_player()
         else:
             self.if_end_two_players()
-
         self.update()
 
     def new_game(self):
@@ -186,9 +186,10 @@ class Game:
         else:
             self.__city_images = []  # if the user presses new game in the middle of the game
             for image_file in CITY_FILES:
-                new_image = PhotoImage(file=image_file)
+                new_image = PhotoImage(file=os.path.join(self.__script_dir, image_file))
                 self.__city_images.append(new_image)
-
+                
+        
         self.update()
 
     def one_player_mode(self):
